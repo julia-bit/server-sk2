@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS messages;
 CREATE TABLE messages(
     sender_id INTEGER,
     receiver_id INTEGER,
-    meassage TEXT;
+    message TEXT;
     sending_date DATE;
 )
 
