@@ -2,7 +2,8 @@
 #include "cJSON_lib/cJSON.h"
 #include <string.h>
 //#include "user_service.h"
-//#include "http_status.h"
+#include "http_status.h"
+#include <stdbool.h>
 
 typedef cJSON *(operation)(cJSON * request, int client_id, http_status * response status);
 
@@ -21,6 +22,7 @@ char *handle_request(request *request)
     }
 
     operation operation = get_operation(request);
+    http_status status;
     int client_id = get_client_id();
     cJSON *response_json = operation(request_json, client_id, &status);
     char *response = get_response(status, response_json);
