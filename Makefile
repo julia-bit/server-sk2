@@ -1,3 +1,4 @@
+LIBS=-lsqlite3
 HEADERS=wsServer/*.h cJSON.h
 FILES=main.c wsServer/*.c cJSON.c
 CFLAGS   =  -Wall -Wextra -O2
