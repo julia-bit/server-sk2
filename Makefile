@@ -4,7 +4,7 @@ FILES=main.c wsServer/*.c cJSON_lib/cJSON.c http_parser/picohttpparser.c request
 
 
 main: $(FILES) $(HEADERS)
-		gcc -g -fsanitize=address -Wall -o main $(FILES) $(LIBS)
+		gcc -g -Wall -o main $(FILES) $(LIBS)
 
 
 .PHONY: clean
