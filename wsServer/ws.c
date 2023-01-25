@@ -410,7 +410,6 @@ static void set_client_address(ws_cli_conn_t *client)
 {
 	struct sockaddr_in addr;
 	socklen_t addr_size;
-	char name[40];
 
 	if (!CLIENT_VALID(client))
 		return;
@@ -419,10 +418,6 @@ static void set_client_address(ws_cli_conn_t *client)
 
 	if (getpeername(client->client_sock, (struct sockaddr *)&addr, &addr_size) < 0)
 		return;
-
-	printf("Please enter your name:\t");
-	scanf("%s",&name);
-	printf("Your name is: %s\n",name);
 	
 
 	memset(client->ip, 0, sizeof(client->ip));

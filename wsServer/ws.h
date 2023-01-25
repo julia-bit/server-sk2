@@ -258,7 +258,6 @@ extern "C" {
 
 	/* External usage. */
 	extern char *ws_getaddress(ws_cli_conn_t *client);
-	extern char *ws_getname(ws_cli_conn_t *client);
 	extern int ws_sendframe(
 		ws_cli_conn_t *cli, const char *msg, uint64_t size, int type);
 	extern int ws_sendframe_txt(ws_cli_conn_t *cli, const char *msg);

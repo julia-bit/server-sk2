@@ -47,8 +47,8 @@
 int get_handshake_accept(char *wsKey, unsigned char **dest)
 {
 	unsigned char hash[SHA1HashSize]; /* SHA-1 Hash.                   */
-	SHA1Context ctx;                  /* SHA-1 Context.                */
-	char *str;                        /* WebSocket key + magic string. */
+	SHA1Context ctx;				  /* SHA-1 Context.                */
+	char *str;						  /* WebSocket key + magic string. */
 
 	/* Invalid key. */
 	if (!wsKey)
@@ -87,9 +87,9 @@ int get_handshake_accept(char *wsKey, unsigned char **dest)
 int get_handshake_response(char *hsrequest, char **hsresponse)
 {
 	unsigned char *accept; /* Accept message.     */
-	char *saveptr;         /* strtok_r() pointer. */
-	char *s;               /* Current string.     */
-	int ret;               /* Return value.       */
+	char *saveptr;		   /* strtok_r() pointer. */
+	char *s;			   /* Current string.     */
+	int ret;			   /* Return value.       */
 
 	saveptr = NULL;
 	for (s = strtok_r(hsrequest, "\r\n", &saveptr); s != NULL;
@@ -104,8 +104,8 @@ int get_handshake_response(char *hsrequest, char **hsresponse)
 		return (-1);
 
 	saveptr = NULL;
-	s       = strtok_r(s, " ", &saveptr);
-	s       = strtok_r(NULL, " ", &saveptr);
+	s = strtok_r(s, " ", &saveptr);
+	s = strtok_r(NULL, " ", &saveptr);
 
 	ret = get_handshake_accept(s, &accept);
 	if (ret < 0)
