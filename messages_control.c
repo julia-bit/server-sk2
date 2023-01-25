@@ -55,21 +55,23 @@ void onmessage(ws_cli_conn_t *client, const unsigned char *msg, uint64_t size, i
     cJSON *operation = cJSON_GetObjectItemCaseSensitive(json, "operation");
     if (strcmp(operation->valuestring, "/start") == 0)
     {
+        printf("start called");
         cJSON *user_id = cJSON_GetObjectItemCaseSensitive(json, "user_id");
         ws_cli_conn_t **client_p = (ws_cli_conn_t **)malloc(sizeof(ws_cli_conn_t *));
         *client_p = client;
         ht_set(clients, &user_id, sizeof(int), client_p, sizeof(ws_cli_conn_t *));
     }
-    else if (strcmp(operation->valuestring, "/newUser") == 0)
+    if (strcmp(operation->valuestring, "/newUser") == 0)
     {
+        printf("new user called");
         cJSON *user_id = cJSON_GetObjectItemCaseSensitive(json, "user_id");
-        add_user(json, user_id);
-
+        add_user(json, user_id->valuestring);
     }
     else if (strcmp(operation->valuestring, "/message") == 0)
     {
+        printf("message called");
         cJSON *message_json = add_message(json);
-        int friend_id = cJSON_GetObjectItemCaseSensitive(message_json, "to")->valueint;
+        char *friend_id = cJSON_GetObjectItemCaseSensitive(message_json, "to")->valuestring;
         char *to_send = cJSON_Print(message_json);
         ws_sendframe_txt(client, to_send);
         ws_cli_conn_t **receipent = (ws_cli_conn_t **)ht_get(clients, &friend_id, sizeof(int), NULL);

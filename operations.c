@@ -23,7 +23,10 @@ char *handle_request(request *request)
 
     operation operation = get_operation(request);
     http_status status;
-    cJSON *user_id = cJSON_GetObjectItemCaseSensitive(request_json, "user_id");
+    cJSON *user_id = cJSON_GetObjectItemCaseSensitive(request_json, "sender_id");
+    if (user_id != NULL){
+        user_id = user_id->valuestring;
+    }
 
     cJSON *response_json = operation(request_json, user_id, &status);
     char *response = get_response(status, response_json);
@@ -56,11 +59,11 @@ operation get_operation(request *request)
     {
         return &get_options;
     }
-    else if (is_operation(request, "GET", "/users"))
+    else if (is_operation(request, "POST", "/users"))
     {
         return &get_users;
     }
-    else if(is_operation(request, "GET", "/messages"))
+    else if(is_operation(request, "POST", "/messages"))
     {
         return &get_messages;
     }
