@@ -1,45 +1,104 @@
-
-#include <stdbool.h>
+#include "cJSON_lib/cJSON.h"
+#include "operations.h"
+#include "messages_control.h"
+#include "requests.h"
+#include <arpa/inet.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <pthread.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
 #include <unistd.h>
-#include "wsServer/ws.h"
 
-void onopen(ws_cli_conn_t *client)
+static int serverSocket;
+
+void int_handler(int sign)
 {
-	char *cli;
-	char *name;
-	cli = ws_getaddress(client); 
-	name = ws_getname(client);
-	printf("Connection opened, addr:  %s message from: %s \n", cli, name);
-
+    shutdown(serverSocket, SHUT_RD);
+    close(serverSocket);
+    close_messages();
 }
 
-void onclose(ws_cli_conn_t *client)
+void *socketThread(void *arg)
 {
-	char *cli;
-	cli = ws_getaddress(client);
-	printf("Connection closed, addr: %s\n", cli);
+    int *socket = (int *)arg;
+
+    request *request = get_request(*socket);
+    if (!request)
+    {
+        printf("closing socket %d\n", *socket);
+        close(*socket);
+        free(socket);
+        pthread_exit(NULL);
+    }
+    printf("%s\n", request->method);
+    printf("%s\n", request->path);
+
+    if (request->has_data == true)
+    {
+        printf("%lu %s\n", strlen(request->data), request->data);
+    }
+
+    char *response = handle_request(request); 
+    send(*socket, response, strlen(response), 0);
+
+    close(*socket);
+    destroy_request(request);
+    free(response);
+    free(socket);
+
+    pthread_exit(NULL);
 }
 
-void onmessage(ws_cli_conn_t *client,
-	const unsigned char *msg, uint64_t size, int type)
+int main(int argc, char const *argv[])
 {
-	char *cli;
-	cli = ws_getaddress(client);
-	printf("I receive a message: %s (size: %" PRId64 ", type: %d), from: %s\n",
-		msg, size, type, cli);
-	ws_sendframe(NULL, (char *)msg, size, type);
-}
+    srand(time(NULL));
 
+    signal(SIGINT, int_handler);
+    struct sockaddr_in serverAddr;
+    struct sockaddr_storage serverStorage;
+    socklen_t addr_size;
 
-int main(void)
-{
-	struct ws_events evs;
-	evs.onopen    = &onopen;
-	evs.onclose   = &onclose;
-	evs.onmessage = &onmessage;
-	ws_socket(&evs, 8080, 0, 1000); 
+    serverSocket = socket(PF_INET, SOCK_STREAM, 0);
+    const int one = 1;
+    setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(1100);
+    serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);
+    bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
 
-	return (0);
+    if (listen(serverSocket, 50) == 0)
+        printf("Listening\n");
+    else
+        printf("Error\n");
+    pthread_t thread_id;
+
+    setup_messages();
+
+    while (1)
+    {
+        addr_size = sizeof serverStorage;
+        int *newSocket = malloc(1 * sizeof(int));
+        if (!newSocket)
+        {
+            fprintf(stderr, "Memory allocation failed!\n");
+            continue;
+        }
+        *newSocket = accept(serverSocket, (struct sockaddr *)&serverStorage, &addr_size);
+        if (*newSocket == -1)
+        {
+            free(newSocket);
+            break;
+        }
+        if (pthread_create(&thread_id, NULL, socketThread, newSocket) != 0)
+            printf("Failed to create thread\n");
+
+        pthread_detach(thread_id);
+    }
+    return 0;
 }

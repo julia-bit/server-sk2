@@ -55,11 +55,16 @@ void onmessage(ws_cli_conn_t *client, const unsigned char *msg, uint64_t size, i
     cJSON *operation = cJSON_GetObjectItemCaseSensitive(json, "operation");
     if (strcmp(operation->valuestring, "/start") == 0)
     {
-        cJSON *token = cJSON_GetObjectItemCaseSensitive(json, "token");
-        int user_id = get_user_id(token->valuestring);
+        cJSON *user_id = cJSON_GetObjectItemCaseSensitive(json, "user_id");
         ws_cli_conn_t **client_p = (ws_cli_conn_t **)malloc(sizeof(ws_cli_conn_t *));
         *client_p = client;
         ht_set(clients, &user_id, sizeof(int), client_p, sizeof(ws_cli_conn_t *));
+    }
+    else if (strcmp(operation->valuestring, "/newUser") == 0)
+    {
+        cJSON *user_id = cJSON_GetObjectItemCaseSensitive(json, "user_id");
+        add_user(json, user_id);
+
     }
     else if (strcmp(operation->valuestring, "/message") == 0)
     {

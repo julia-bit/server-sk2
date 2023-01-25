@@ -5,12 +5,12 @@
 #include "http_status.h"
 #include <stdbool.h>
 
-typedef cJSON *(operation)(cJSON * request, int client_id, http_status * response status);
+typedef cJSON *(*operation)(cJSON * request, int user_id, http_status *response_status);
 
 bool is_operation(request *request, char *method, char *path);
 operation get_operation(request *request);
-cJSON *get_options(cJSON *request, int client_id, http_status *response_status);
-cJSON *disallowed_method(cJSON *request, int client_id, http_status *response_status);
+cJSON *get_options(cJSON *request, int user_id, http_status *response_status);
+cJSON *disallowed_method(cJSON *request, int user_id, http_status *response_status);
 
 
 char *handle_request(request *request)
@@ -23,8 +23,9 @@ char *handle_request(request *request)
 
     operation operation = get_operation(request);
     http_status status;
-    int client_id = get_client_id();
-    cJSON *response_json = operation(request_json, client_id, &status);
+    cJSON *user_id = cJSON_GetObjectItemCaseSensitive(request_json, "user_id");
+
+    cJSON *response_json = operation(request_json, user_id, &status);
     char *response = get_response(status, response_json);
 
     if (response_json != NULL)
@@ -66,13 +67,13 @@ operation get_operation(request *request)
     return &disallowed_method;
 }
 
-cJSON *get_options(cJSON *request, int client_id, http_status *response_status)
+cJSON *get_options(cJSON *request, int user_id, http_status *response_status)
 {
     *response_status = HTTP_OK;
     return NULL;
 }
 
-cJSON *disallowed_method(cJSON *request, int client_id, http_status *response_status)
+cJSON *disallowed_method(cJSON *request, int user_id, http_status *response_status)
 {
     *response_status = HTTP_DISALLOWED_METHOD;
     return NULL;

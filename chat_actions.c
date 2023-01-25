@@ -26,11 +26,32 @@ cJSON *get_users(cJSON *request, int user_id, http_status *response_status)
         }
     
     }
-    sqlite3_finlize(stmt);
+    sqlite3_finalize(stmt);
 
-    sqlite_close(db);
+    sqlite3_close(db);
     *response_status = HTTP_OK;
     return response_json;
+}
+
+cJSON *add_user(cJSON *request, int user_id)
+{
+    sqlite3 *db;
+    sqlite3_open("chat-sk.db", &db);
+    sqlite3_stmt *stmt;
+
+    cJSON *username = cJSON_GetObjectItemCaseSensitive(request, "username");
+    char *sql = "INSERT INTO users VALUES(?)";
+    sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+
+    if(stmt != NULL) {
+        sqlite3_bind_int(stmt, 1, user_id);
+        sqlite3_bind_int(stmt, 2, username->valueint);
+        sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+    }
+
+    sqlite3_close(db);
+    return NULL;
 }
 
 cJSON *add_message(cJSON *request)
@@ -87,6 +108,7 @@ cJSON *add_message(cJSON *request)
     sqlite3_close(db);
     return message_json;
 }
+
 
 cJSON *get_messages(cJSON *request, int sender_id, http_status *response_status)
 {
