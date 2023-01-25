@@ -5,12 +5,12 @@
 #include "http_status.h"
 #include <stdbool.h>
 
-typedef cJSON *(*operation)(cJSON * request, int user_id, http_status *response_status);
+typedef cJSON *(*operation)(cJSON * request, char *user_id, http_status *response_status);
 
 bool is_operation(request *request, char *method, char *path);
 operation get_operation(request *request);
-cJSON *get_options(cJSON *request, int user_id, http_status *response_status);
-cJSON *disallowed_method(cJSON *request, int user_id, http_status *response_status);
+cJSON *get_options(cJSON *request, char *user_id, http_status *response_status);
+cJSON *disallowed_method(cJSON *request, char *user_id, http_status *response_status);
 
 
 char *handle_request(request *request)
@@ -67,13 +67,13 @@ operation get_operation(request *request)
     return &disallowed_method;
 }
 
-cJSON *get_options(cJSON *request, int user_id, http_status *response_status)
+cJSON *get_options(cJSON *request, char *user_id, http_status *response_status)
 {
     *response_status = HTTP_OK;
     return NULL;
 }
 
-cJSON *disallowed_method(cJSON *request, int user_id, http_status *response_status)
+cJSON *disallowed_method(cJSON *request, char *user_id, http_status *response_status)
 {
     *response_status = HTTP_DISALLOWED_METHOD;
     return NULL;

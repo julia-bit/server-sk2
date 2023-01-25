@@ -6,9 +6,9 @@
 #include <stdbool.h>
 
 
-cJSON *get_users(cJSON *request, int user_id, http_status *response_status);
+cJSON *get_users(cJSON *request, char *user_id, http_status *response_status);
 cJSON *add_message(cJSON *request);
 cJSON *get_messages(cJSON *request, int user_id, http_status *response_status);
-cJSON *add_user(cJSON *request, int user_id);
+cJSON *add_user(cJSON *request, char *user_id);
 
 #endif

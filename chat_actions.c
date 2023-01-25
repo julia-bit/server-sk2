@@ -5,7 +5,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-cJSON *get_users(cJSON *request, int user_id, http_status *response_status)
+cJSON *get_users(cJSON *request, char *user_id, http_status *response_status)
 {
     sqlite3 *db;
     sqlite3_open("chat-sk.db", &db);
@@ -20,7 +20,7 @@ cJSON *get_users(cJSON *request, int user_id, http_status *response_status)
         while(sqlite3_step(stmt) != SQLITE_DONE)
         {
             cJSON *user_json = cJSON_CreateObject();
-            cJSON_AddNumberToObject(user_json, "user_id", sqlite3_column_int(stmt, 0));
+            cJSON_AddStringToObject(user_json, "user_id", sqlite3_column_text(stmt, 0));
             cJSON_AddStringToObject(user_json, "username", sqlite3_column_text(stmt, 1));
             cJSON_AddItemToArray(response_json, user_json);
         }
@@ -33,7 +33,7 @@ cJSON *get_users(cJSON *request, int user_id, http_status *response_status)
     return response_json;
 }
 
-cJSON *add_user(cJSON *request, int user_id)
+cJSON *add_user(cJSON *request, char *user_id)
 {
     sqlite3 *db;
     sqlite3_open("chat-sk.db", &db);
@@ -44,7 +44,7 @@ cJSON *add_user(cJSON *request, int user_id)
     sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if(stmt != NULL) {
-        sqlite3_bind_int(stmt, 1, user_id);
+        sqlite3_bind_text(stmt, 1, user_id,-1, SQLITE_TRANSIENT);
         sqlite3_bind_int(stmt, 2, username->valueint);
         sqlite3_step(stmt);
         sqlite3_finalize(stmt);
@@ -61,7 +61,7 @@ cJSON *add_message(cJSON *request)
     cJSON *message = cJSON_GetObjectItemCaseSensitive(request, "message");
     cJSON *timestamp = cJSON_GetObjectItemCaseSensitive(request, "timestamp");
 
-    int user_id = from->valueint;
+    char *user_id = from->valuestring;
     int friend_id = to->valueint;
     char *message_str = message->valuestring;
     char *timestamp_str = timestamp->valuestring;
@@ -74,7 +74,7 @@ cJSON *add_message(cJSON *request)
     sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 
     if(stmt != NULL) {
-        sqlite3_bind_int(stmt, 1, user_id);
+        sqlite3_bind_text(stmt, 1, user_id,-1, SQLITE_TRANSIENT);
         sqlite3_bind_int(stmt, 2, friend_id);
         sqlite3_bind_text(stmt, 3, message_str, -1, SQLITE_TRANSIENT);
         sqlite3_bind_text(stmt, 4, timestamp_str, -1, SQLITE_TRANSIENT);
@@ -88,7 +88,7 @@ cJSON *add_message(cJSON *request)
     int message_id = 0;
 
     if(stmt2 != NULL) {
-        sqlite3_bind_int(stmt2, 1, user_id);
+        sqlite3_bind_text(stmt2, 1, user_id,-1, SQLITE_TRANSIENT);
         sqlite3_bind_int(stmt2, 2, friend_id);
         sqlite3_bind_text(stmt2, 3, message_str, -1, SQLITE_TRANSIENT);
         sqlite3_bind_text(stmt2, 4, timestamp_str, -1, SQLITE_TRANSIENT);
@@ -100,7 +100,7 @@ cJSON *add_message(cJSON *request)
 
     cJSON *message_json = cJSON_CreateObject();
     cJSON_AddNumberToObject(message_json, "id", message_id);
-    cJSON_AddNumberToObject(message_json, "sender", user_id);
+    cJSON_AddStringToObject(message_json, "sender", user_id);
     cJSON_AddNumberToObject(message_json, "receiver", friend_id);
     cJSON_AddStringToObject(message_json, "message", message_str);
     cJSON_AddStringToObject(message_json, "date", timestamp_str);
