@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .input {
+    @apply bg-slate-800 text-slate-50 border-slate-50 rounded-lg p-2 border 
+  }
+
+  .button {
+    @apply  px-4 py-2 bg-slate-300 text-slate-900 rounded-lg w-fit
+  }
+}

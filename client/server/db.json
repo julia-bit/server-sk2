@@ -1,0 +1,32 @@
+{
+  "messages": [
+    {
+      "sender": "Cpxb1m3MIVbA99E38sqqLzzvnwF3",
+      "receiver": "pMgwy4Kko9bqBeRscMCH7moJBNl1",
+      "text": "N",
+      "date": "2023-01-25T15:40:47Z"
+    },
+    {
+      "sender": "pMgwy4Kko9bqBeRscMCH7moJBNl1",
+      "receiver": "Cpxb1m3MIVbA99E38sqqLzzvnwF3",
+      "text": "I",
+      "date": "2023-01-25T15:41:47Z"
+    },
+    {
+      "sender": "Cpxb1m3MIVbA99E38sqqLzzvnwF3",
+      "receiver": "pMgwy4Kko9bqBeRscMCH7moJBNl1",
+      "text": "G",
+      "date": "2023-01-25T15:42:47Z"
+    },
+    {
+      "sender": "pMgwy4Kko9bqBeRscMCH7moJBNl1",
+      "receiver": "Cpxb1m3MIVbA99E38sqqLzzvnwF3",
+      "text": "G",
+      "date": "2023-01-25T15:43:47Z"
+    }
+  ],
+  "users": [
+    { "uid": "Cpxb1m3MIVbA99E38sqqLzzvnwF3", "email": "k@h.com" },
+    { "uid": "pMgwy4Kko9bqBeRscMCH7moJBNl1", "email": "da@fas.com" }
+  ]
+}
